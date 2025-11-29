@@ -1,0 +1,5 @@
+{
+  "name": "A.Cliente Pro",
+  "description": "An application for an e-commerce store that uses Gemini to analyze customer support emails and automatically generate professional, on-brand email responses. The app provides an editable preview and an option to copy the full HTML response.",
+  "requestFramePermissions": []
+}
