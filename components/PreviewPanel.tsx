@@ -226,14 +226,16 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
             </button>
             <button
               onClick={onApprove}
-              className="px-5 py-2.5 text-xs font-bold text-white bg-green-600 hover:bg-green-700 rounded-xl flex items-center space-x-2 transition-all shadow-md active:scale-95"
+              className="px-6 py-2.5 text-xs font-bold text-slate-900 bg-yellow-400 hover:bg-yellow-500 rounded-lg flex items-center space-x-2 transition-all shadow-md active:scale-95"
             >
               <CheckIcon className="w-4 h-4" />
               <span>Approve</span>
             </button>
             <button
               onClick={() => onCopyToClipboard(generatedEmail.body)}
-              className={`px-5 py-2.5 text-xs font-bold text-white rounded-xl flex items-center space-x-2 transition-all shadow-md active:scale-95 ${copied ? 'bg-green-500 hover:bg-green-600' : 'bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500'}`}
+              className={`px-5 py-2.5 text-xs font-bold rounded-lg flex items-center space-x-2 transition-all active:scale-95 border ${copied
+                ? 'bg-green-50 text-green-600 border-green-200'
+                : 'bg-transparent text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
             >
               {copied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
               <span>{copied ? t.copiedBtn : t.copyBtn}</span>
