@@ -1,8 +1,9 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { InputPanel } from './components/InputPanel';
 import { PreviewPanel } from './components/PreviewPanel';
+import { LoginScreen } from './components/LoginScreen';
 import { GenerationMode, GeneratedEmail, Language } from './types';
 import { generateEmailResponse, refineEmailResponse } from './services/geminiService';
 import { fetchPendingEmails, updateEmailStatus, MappedEmail } from './services/airtableService';
@@ -135,6 +136,11 @@ const translations = {
 };
 
 export default function App() {
+  // Authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginError, setLoginError] = useState(false);
+
+  // App state
   const [customerEmail, setCustomerEmail] = useState('');
   const [generationMode, setGenerationMode] = useState<GenerationMode>(GenerationMode.Standard);
   const [customInstructions, setCustomInstructions] = useState('');
@@ -148,17 +154,41 @@ export default function App() {
 
   const t = translations[language];
 
-  React.useEffect(() => {
-    const loadEmails = async () => {
-      try {
-        const pendingEmails = await fetchPendingEmails();
-        setEmails(pendingEmails);
-      } catch (err) {
-        console.error("Failed to load emails", err);
-      }
-    };
-    loadEmails();
+  // Check authentication on mount
+  useEffect(() => {
+    const authStatus = localStorage.getItem('isAuthenticated');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    }
   }, []);
+
+  // Load emails after authentication
+  useEffect(() => {
+    if (isAuthenticated) {
+      const loadEmails = async () => {
+        try {
+          const pendingEmails = await fetchPendingEmails();
+          setEmails(pendingEmails);
+        } catch (err) {
+          console.error("Failed to load emails", err);
+        }
+      };
+      loadEmails();
+    }
+  }, [isAuthenticated]);
+
+  // Handle login
+  const handleLogin = (password: string) => {
+    const correctPassword = import.meta.env.VITE_APP_PASSWORD;
+
+    if (password === correctPassword) {
+      localStorage.setItem('isAuthenticated', 'true');
+      setIsAuthenticated(true);
+      setLoginError(false);
+    } else {
+      setLoginError(true);
+    }
+  };
 
   const handleGenerate = useCallback(async () => {
     if (!customerEmail.trim() || isLoading) return;
@@ -255,6 +285,12 @@ export default function App() {
     setActiveEmailId(id);
   };
 
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <LoginScreen onLogin={handleLogin} error={loginError} />;
+  }
+
+  // Main app
   return (
     <div className="min-h-screen bg-[#f0f2f5] dark:bg-[#0f172a] text-slate-900 dark:text-slate-200 font-sans selection:bg-indigo-500 selection:text-white pb-24 lg:pb-12">
       {/* Refined Background */}
