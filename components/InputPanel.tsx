@@ -17,6 +17,7 @@ interface InputPanelProps {
   isGenerating: boolean;
   onGenerate: () => void;
   isEmailSelected: boolean;
+  onDiscard: (emailId: string) => void;
   t: any;
 }
 
@@ -35,6 +36,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
   isGenerating,
   onGenerate,
   isEmailSelected,
+  onDiscard,
   t,
 }) => {
   const [isConnected, setIsConnected] = useState(false);
@@ -157,7 +159,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
             <div className="flex-grow overflow-hidden relative">
               {activeTab === 'inbox' ? (
                 <>
-                  <EmailList emails={emails} selectedEmailId={selectedEmailId} onSelectEmail={handleSelectEmail} t={t} />
+                  <EmailList emails={emails} selectedEmailId={selectedEmailId} onSelectEmail={handleSelectEmail} onDiscard={onDiscard} t={t} />
                 </>
               ) : (
                 <div className="h-full flex flex-col p-4">

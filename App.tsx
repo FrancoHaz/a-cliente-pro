@@ -65,7 +65,10 @@ const translations = {
     qaRefund: "Refund",
     qaDiscount: "Discount",
     qaShipping: "Shipping Times",
-    qaShippingValue: "Clarify that preparation time is 1-3 business days and shipping time is 3-6 business days."
+    qaShippingValue: "Clarify that preparation time is 1-3 business days and shipping time is 3-6 business days.",
+    // Discard/Spam
+    discardBtn: "Discard",
+    discardConfirm: "Are you sure you want to discard this email as spam? This action cannot be undone."
   },
   es: {
     headerTitle: "A.Cliente Pro",
@@ -124,7 +127,10 @@ const translations = {
     qaRefund: "Reembolso",
     qaDiscount: "Descuento",
     qaShipping: "Tiempos de Envío",
-    qaShippingValue: "Aclarar que el tiempo estimado de preparación es de 1 a 3 días hábiles y el tiempo de envío es de 3 a 6 días hábiles."
+    qaShippingValue: "Aclarar que el tiempo estimado de preparación es de 1 a 3 días hábiles y el tiempo de envío es de 3 a 6 días hábiles.",
+    // Discard/Spam
+    discardBtn: "Descartar",
+    discardConfirm: "¿Estás seguro de que quieres descartar este correo como spam? Esta acción no se puede deshacer."
   }
 };
 
@@ -218,6 +224,29 @@ export default function App() {
     }
   };
 
+  const handleDiscard = async (emailId: string) => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(t.discardConfirm);
+
+    if (!confirmed) return;
+
+    try {
+      await updateEmailStatus(emailId, 'Ignored');
+      // Remove discarded email from list immediately
+      setEmails(prev => prev.filter(e => e.id !== emailId));
+
+      // Clear selection if the discarded email was selected
+      if (activeEmailId === emailId) {
+        setGeneratedEmail(null);
+        setCustomerEmail('');
+        setActiveEmailId(null);
+      }
+    } catch (err) {
+      console.error("Failed to discard email", err);
+      setError("Failed to update status in Airtable");
+    }
+  };
+
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang);
   };
@@ -254,6 +283,7 @@ export default function App() {
               isGenerating={isLoading}
               onGenerate={handleGenerate}
               isEmailSelected={!!customerEmail.trim()}
+              onDiscard={handleDiscard}
               t={t}
             />
           </div>
