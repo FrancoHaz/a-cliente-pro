@@ -14,47 +14,47 @@ const GmailPreviewModal: React.FC<GmailPreviewModalProps> = ({ email, onClose, t
   if (!email) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300" onClick={onClose}>
+    <div className="fixed inset-0 bg-white/95 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-opacity duration-300" onClick={onClose}>
       <div
-        className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200 dark:border-slate-700"
+        className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-gray-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-[#f2f2f2] dark:bg-[#1e1e1e] border-b border-slate-300 dark:border-slate-700 flex-shrink-0">
+        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center space-x-2">
             <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Gmail" className="w-5 h-5" />
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Gmail Preview</span>
+            <span className="text-sm font-medium text-gray-700">Gmail Preview</span>
           </div>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 transition-colors">
+          <button onClick={onClose} className="text-gray-400 hover:text-black transition-colors">
             <XIcon className="w-5 h-5" />
           </button>
         </div>
 
         {/* Email Headers Area */}
-        <div className="px-6 py-4 bg-white dark:bg-[#1e1e1e] space-y-4 flex-shrink-0">
-          <h2 className="text-xl font-normal text-slate-900 dark:text-white">{email.subject}</h2>
+        <div className="px-6 py-4 bg-white space-y-4 flex-shrink-0">
+          <h2 className="text-xl font-normal text-gray-900">{email.subject}</h2>
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg">
+            <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-bold text-lg">
               F
             </div>
             <div className="flex-1">
               <div className="flex items-baseline justify-between">
-                <span className="font-bold text-sm text-slate-900 dark:text-white">Franco AI Team <span className="font-normal text-xs text-slate-500">&lt;support@franco-ai.com&gt;</span></span>
-                <span className="text-xs text-slate-500">10:30 AM (0 minutes ago)</span>
+                <span className="font-bold text-sm text-gray-900">Franco AI Team <span className="font-normal text-xs text-gray-500">&lt;support@franco-ai.com&gt;</span></span>
+                <span className="text-xs text-gray-500">10:30 AM (0 minutes ago)</span>
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                to {t.modalTo} <span className="text-slate-800 dark:text-slate-200">Me</span>
+              <div className="text-xs text-gray-500 mt-0.5">
+                to {t.modalTo} <span className="text-gray-900">Me</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Email Body */}
-        <div className="flex-grow p-6 overflow-y-auto bg-white dark:bg-[#1e1e1e] custom-scrollbar">
-          <div className="max-w-3xl" dangerouslySetInnerHTML={{ __html: email.body }} />
-          <div className="mt-8 pt-4 border-t border-slate-200 dark:border-slate-700 flex gap-2">
-            <button className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-full text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Reply</button>
-            <button className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-full text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Forward</button>
+        <div className="flex-grow p-6 overflow-y-auto bg-white custom-scrollbar">
+          <div className="max-w-3xl text-gray-900" dangerouslySetInnerHTML={{ __html: email.body }} />
+          <div className="mt-8 pt-4 border-t border-gray-200 flex gap-2">
+            <button className="px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Reply</button>
+            <button className="px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Forward</button>
           </div>
         </div>
       </div>
@@ -150,56 +150,49 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
 
   if (error) {
     return (
-      <div className="h-full min-h-[400px] bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-red-100 dark:border-red-900/30 flex flex-col items-center justify-center p-8 text-center">
-        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4">
+      <div className="h-full min-h-[400px] bg-white rounded-3xl shadow-sm border border-red-100 flex flex-col items-center justify-center p-8 text-center">
+        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4 border border-red-100">
           <XIcon className="w-8 h-8" />
         </div>
-        <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{t.previewFailed}</p>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-md">{error}</p>
+        <p className="text-xl font-bold text-gray-900">{t.previewFailed}</p>
+        <p className="text-sm text-gray-500 mt-2 max-w-md">{error}</p>
       </div>
     );
   }
 
   if (!generatedEmail) {
     return (
-      <div className="h-full min-h-[400px] bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center p-10 text-center">
+      <div className="h-full min-h-[400px] bg-gray-50 rounded-3xl border border-dashed border-gray-300 flex flex-col items-center justify-center p-10 text-center">
         <div className="relative mb-8">
-          <div className="absolute inset-0 bg-indigo-400 blur-3xl opacity-20 rounded-full"></div>
-          <div className="relative w-24 h-24 bg-white dark:bg-slate-700 rounded-2xl shadow-xl flex items-center justify-center transform rotate-6 transition-transform hover:rotate-0 duration-500">
-            <SendIcon className="w-10 h-10 text-indigo-600 dark:text-indigo-400" />
+          <div className="w-24 h-24 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center">
+            <SendIcon className="w-8 h-8 text-gray-300" />
           </div>
         </div>
 
-        <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-3">{t.previewPlaceholder}</h3>
-        <p className="text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed">
+        <h3 className="text-lg font-bold text-gray-900 mb-2">{t.previewPlaceholder}</h3>
+        <p className="text-gray-500 text-sm max-w-sm leading-relaxed">
           {t.previewPlaceholderDesc}
         </p>
-
-        <div className="mt-8 flex gap-2 opacity-60">
-          <div className="h-2 w-2 rounded-full bg-slate-300 dark:bg-slate-600"></div>
-          <div className="h-2 w-2 rounded-full bg-slate-300 dark:bg-slate-600"></div>
-          <div className="h-2 w-2 rounded-full bg-slate-300 dark:bg-slate-600"></div>
-        </div>
       </div>
     );
   }
 
   return (
     <>
-      <div className="h-full min-h-[500px] bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col transition-all duration-500">
+      <div className="h-full bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden flex flex-col transition-all duration-500">
         {/* Toolbar */}
-        <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex flex-wrap gap-2 justify-between items-center bg-white dark:bg-slate-800 z-10">
-          <div className="flex bg-slate-100 dark:bg-slate-700/50 p-1 rounded-xl">
+        <div className="flex-none p-4 border-b border-gray-100 flex flex-wrap gap-2 justify-between items-center bg-white z-10">
+          <div className="flex bg-gray-50 p-1 rounded-lg border border-gray-200">
             <button
               onClick={() => setIsHtmlView(false)}
-              className={`px-4 py-2 text-xs font-bold rounded-lg flex items-center space-x-2 transition-all ${!isHtmlView ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
+              className={`px-4 py-2 text-xs font-bold rounded-md flex items-center space-x-2 transition-all ${!isHtmlView ? 'bg-white text-black shadow-sm border border-gray-100' : 'text-gray-500 hover:text-gray-900'}`}
             >
               <EyeIcon className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">{t.previewBtn}</span>
             </button>
             <button
               onClick={() => setIsHtmlView(true)}
-              className={`px-4 py-2 text-xs font-bold rounded-lg flex items-center space-x-2 transition-all ${isHtmlView ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
+              className={`px-4 py-2 text-xs font-bold rounded-md flex items-center space-x-2 transition-all ${isHtmlView ? 'bg-white text-black shadow-sm border border-gray-100' : 'text-gray-500 hover:text-gray-900'}`}
             >
               <CodeIcon className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">{t.htmlBtn}</span>
@@ -210,7 +203,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
             {isHtmlView && (
               <button
                 onClick={formatHTML}
-                className="px-3 py-2 text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors flex items-center gap-1.5"
+                className="px-3 py-2 text-xs font-medium bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1.5 border border-gray-200"
                 title="Auto-format HTML"
               >
                 <MagicWandIcon className="w-3.5 h-3.5" />
@@ -219,14 +212,15 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
             )}
             <button
               onClick={() => setIsGmailPreviewOpen(true)}
-              className="p-2.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:text-slate-400 dark:hover:bg-slate-700 rounded-xl transition-colors"
-              title="Open Gmail Preview"
+              className="px-4 py-2 text-xs font-medium bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+              title="Vista previa Gmail"
             >
-              <ExpandIcon className="w-5 h-5" />
+              <ExpandIcon className="w-4 h-4" />
+              <span className="hidden sm:inline">Vista Gmail</span>
             </button>
             <button
               onClick={onApprove}
-              className="px-6 py-2.5 text-xs font-bold text-slate-900 bg-yellow-400 hover:bg-yellow-500 rounded-lg flex items-center space-x-2 transition-all shadow-md active:scale-95"
+              className="px-6 py-2.5 text-xs font-bold text-white bg-black hover:bg-gray-800 rounded-lg flex items-center space-x-2 transition-all shadow-sm active:scale-95"
             >
               <CheckIcon className="w-4 h-4" />
               <span>Approve</span>
@@ -235,7 +229,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
               onClick={() => onCopyToClipboard(generatedEmail.body)}
               className={`px-5 py-2.5 text-xs font-bold rounded-lg flex items-center space-x-2 transition-all active:scale-95 border ${copied
                 ? 'bg-green-50 text-green-600 border-green-200'
-                : 'bg-transparent text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
             >
               {copied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
               <span>{copied ? t.copiedBtn : t.copyBtn}</span>
@@ -244,7 +238,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
         </div>
 
         {/* Refinement Bar (Chat Style) */}
-        <div className="px-4 sm:px-6 py-3 bg-slate-50 dark:bg-slate-900/30 border-b border-slate-100 dark:border-slate-700">
+        <div className="flex-none px-4 sm:px-6 py-3 bg-gray-50 border-b border-gray-200">
           <div className="relative flex items-center">
             <input
               type="text"
@@ -265,9 +259,9 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
         </div>
 
         {/* Content Area */}
-        <div className="flex-grow flex flex-col overflow-hidden relative group h-[500px] lg:h-auto">
+        <div className="flex-1 flex flex-col overflow-hidden min-h-0">
           {/* Subject Line Input */}
-          <div className="px-6 sm:px-8 pt-6 pb-4 bg-white dark:bg-slate-800">
+          <div className="flex-none px-6 sm:px-8 pt-6 pb-4 bg-white">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block">{t.emailSubject}</label>
             <input
               type="text"
@@ -278,9 +272,9 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
             />
           </div>
 
-          <div className="flex-grow min-h-0 relative">
+          <div className="flex-1 overflow-y-auto min-h-0">
             {isHtmlView ? (
-              <div className="absolute inset-0 bg-[#0d1117] flex flex-col">
+              <div className="h-full bg-[#0d1117] flex flex-col">
                 <div className="flex flex-1 overflow-hidden">
                   <div className="hidden sm:block w-10 bg-[#0d1117] border-r border-slate-800 pt-6 text-right pr-2 text-slate-600 select-none font-mono text-xs leading-6">
                     {Array.from({ length: 20 }).map((_, i) => <div key={i}>{i + 1}</div>)}
@@ -288,7 +282,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                   <textarea
                     value={generatedEmail.body}
                     onChange={handleBodyChange}
-                    className="flex-1 w-full h-full p-4 sm:p-6 bg-[#0d1117] text-slate-300 font-mono text-xs sm:text-sm leading-6 resize-none focus:outline-none custom-scrollbar whitespace-pre"
+                    className="flex-1 w-full h-full p-4 sm:p-6 pb-20 bg-[#0d1117] text-slate-300 font-mono text-xs sm:text-sm leading-6 resize-none focus:outline-none custom-scrollbar whitespace-pre"
                     spellCheck="false"
                     autoCorrect="off"
                     autoCapitalize="off"
@@ -296,7 +290,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="h-full overflow-y-auto px-4 sm:px-8 pb-8 custom-scrollbar">
+              <div className="h-full overflow-y-auto px-4 sm:px-8 pb-20 custom-scrollbar bg-white">
                 {/* Simulate Email Client Container within the card */}
                 <div className="bg-white rounded-lg p-1 min-h-full shadow-sm border border-slate-100">
                   <div className="overflow-x-auto">

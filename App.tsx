@@ -5,6 +5,7 @@ import { InputPanel } from './components/InputPanel';
 import { PreviewPanel } from './components/PreviewPanel';
 import { ControlPanel } from './components/ControlPanel';
 import { LoginScreen } from './components/LoginScreen';
+import { Footer } from './components/Footer';
 import { ArrowLeftIcon, InboxIcon } from './components/Icons';
 import { GenerationMode, GeneratedEmail, Language } from './types';
 import { generateEmailResponse, refineEmailResponse } from './services/geminiService';
@@ -146,6 +147,11 @@ export default function App() {
   const [customerEmail, setCustomerEmail] = useState('');
   const [generationMode, setGenerationMode] = useState<GenerationMode>(GenerationMode.Standard);
   const [customInstructions, setCustomInstructions] = useState('');
+  // New State for Enhanced UI
+  const [trackingNumber, setTrackingNumber] = useState('');
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const [selectedTone, setSelectedTone] = useState<string | null>(null);
+
   const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -297,91 +303,93 @@ export default function App() {
 
   // Main app
   return (
-    <div className="min-h-screen bg-[#f0f2f5] dark:bg-[#0f172a] text-slate-900 dark:text-slate-200 font-sans selection:bg-indigo-500 selection:text-white pb-24 lg:pb-0 lg:h-screen lg:overflow-hidden flex flex-col">
-      {/* Refined Background */}
-      <div className="fixed top-0 left-0 w-full h-[500px] bg-gradient-to-b from-white to-transparent dark:from-slate-900 dark:to-transparent -z-10 pointer-events-none" />
+    <div className="h-screen w-screen flex flex-col bg-white overflow-hidden">
+      {/* 1. Header Fijo */}
+      <div className="flex-none z-10">
+        <Header
+          language={language}
+          setLanguage={handleSetLanguage}
+          t={t}
+        />
+      </div>
 
-      <Header
-        language={language}
-        setLanguage={handleSetLanguage}
-        t={t}
-      />
+      {/* 2. Área Principal de Trabajo (Ocupa TODO el espacio restante) */}
+      <main className="flex-1 flex overflow-hidden min-h-0">
+        {/* A. Sidebar / EmailList (Izquierda) */}
+        <div className={`w-full lg:w-1/3 h-full flex flex-col border-r border-gray-200 bg-gray-50 ${activeEmailId ? 'hidden lg:flex' : 'flex'}`}>
+          <InputPanel
+            emails={emails}
+            selectedEmailId={activeEmailId}
+            onSelectEmailId={handleSelectEmailId}
+            customerEmail={customerEmail}
+            setCustomerEmail={setCustomerEmail}
+            isEmailSelected={!!customerEmail.trim()}
+            onDiscard={handleDiscard}
+            isGenerating={isLoading}
+            t={t}
+          />
+        </div>
 
-      <main className="flex-grow px-3 sm:px-6 md:px-8 pt-6 lg:pt-8 lg:pb-8 lg:h-[calc(100vh-80px)]">
-        <div className="max-w-[1600px] mx-auto h-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        {/* B. Panel Central/Derecho (Detalles y Previsualización) */}
+        <div className={`flex-1 h-full flex flex-col min-w-0 bg-white overflow-hidden ${activeEmailId ? 'flex' : 'hidden lg:flex'}`}>
 
-          {/* Left Column: Sidebar (Email List) */}
-          <div className={`lg:col-span-4 xl:col-span-3 h-full flex flex-col ${activeEmailId ? 'hidden lg:flex' : 'flex'}`}>
-            <InputPanel
-              emails={emails}
-              selectedEmailId={activeEmailId}
-              onSelectEmailId={handleSelectEmailId}
-              customerEmail={customerEmail}
-              setCustomerEmail={setCustomerEmail}
-              isEmailSelected={!!customerEmail.trim()}
-              onDiscard={handleDiscard}
-              t={t}
-            />
+          {/* Mobile Back Button Header */}
+          <div className="lg:hidden flex items-center gap-2 mb-2">
+            <button
+              onClick={() => {
+                setActiveEmailId(null);
+                setCustomerEmail('');
+                setGeneratedEmail(null);
+              }}
+              className="flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 font-medium text-sm px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <ArrowLeftIcon className="w-4 h-4" />
+              Volver a la lista
+            </button>
           </div>
 
-          {/* Right Column: Main Panel (Reading & Actions) */}
-          <div className={`lg:col-span-8 xl:col-span-9 h-full flex flex-col gap-6 overflow-y-auto custom-scrollbar ${activeEmailId ? 'flex' : 'hidden lg:flex'}`}>
-
-            {/* Mobile Back Button Header */}
-            <div className="lg:hidden flex items-center gap-2 mb-2">
-              <button
-                onClick={() => {
-                  setActiveEmailId(null);
-                  setCustomerEmail('');
-                  setGeneratedEmail(null);
-                }}
-                className="flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 font-medium text-sm px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              >
-                <ArrowLeftIcon className="w-4 h-4" />
-                Volver a la lista
-              </button>
-            </div>
-
-            {activeEmailId && (activeEmail || activeEmailId === 'manual_draft') ? (
-              <div className="space-y-6 pb-20 lg:pb-0 animate-in fade-in slide-in-from-right-4 duration-300">
-                {/* Email Reader Card OR Manual Input */}
-                {activeEmailId === 'manual_draft' ? (
-                  <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg text-yellow-600 dark:text-yellow-400">
-                        <InboxIcon className="w-5 h-5" />
+          {activeEmailId && (activeEmail || activeEmailId === 'manual_draft') ? (
+            <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">
+              <div className="p-4 sm:p-6 pb-20 space-y-6">
+                {/* Single Column Layout - All content stacked vertically */}
+                <div className="space-y-6">
+                  {/* Email Reader Card */}
+                  {activeEmailId === 'manual_draft' ? (
+                    <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg text-yellow-600 dark:text-yellow-400">
+                          <InboxIcon className="w-5 h-5" />
+                        </div>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t.manualLabel}</h2>
                       </div>
-                      <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t.manualLabel}</h2>
+                      <textarea
+                        value={customerEmail}
+                        onChange={(e) => setCustomerEmail(e.target.value)}
+                        placeholder={t.manualPlaceholder}
+                        className="w-full h-64 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none resize-none custom-scrollbar transition-all font-mono"
+                        autoFocus
+                      />
                     </div>
-                    <textarea
-                      value={customerEmail}
-                      onChange={(e) => setCustomerEmail(e.target.value)}
-                      placeholder={t.manualPlaceholder}
-                      className="w-full h-64 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none resize-none custom-scrollbar transition-all font-mono"
-                      autoFocus
-                    />
-                  </div>
-                ) : (
-                  <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
-                    <div className="flex items-start justify-between mb-6">
-                      <div>
-                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">{activeEmail?.subject}</h2>
-                        <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
-                          <span className="font-medium text-slate-900 dark:text-slate-200">{activeEmail?.senderName}</span>
-                          <span>&lt;{activeEmail?.senderEmail}&gt;</span>
-                          <span>•</span>
-                          <span>{new Date(activeEmail?.receivedAt || '').toLocaleString()}</span>
+                  ) : (
+                    <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                      <div className="flex items-start justify-between mb-6 gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 break-words">{activeEmail?.subject}</h2>
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm text-slate-500 dark:text-slate-400">
+                            <span className="font-medium text-slate-900 dark:text-slate-200">{activeEmail?.senderName}</span>
+                            <span className="break-all">&lt;{activeEmail?.senderEmail}&gt;</span>
+                            <span className="hidden sm:inline">•</span>
+                            <span className="whitespace-nowrap">{new Date(activeEmail?.receivedAt || '').toLocaleString()}</span>
+                          </div>
                         </div>
                       </div>
+                      <div className="prose dark:prose-invert prose-slate max-w-none text-sm leading-relaxed whitespace-pre-wrap text-slate-600 dark:text-slate-300">
+                        {activeEmail?.body}
+                      </div>
                     </div>
-                    <div className="prose dark:prose-invert prose-slate max-w-none text-sm leading-relaxed whitespace-pre-wrap text-slate-600 dark:text-slate-300">
-                      {activeEmail?.body}
-                    </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Controls & Generation */}
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                  {/* ControlPanel */}
                   <ControlPanel
                     generationMode={generationMode}
                     setGenerationMode={setGenerationMode}
@@ -390,42 +398,52 @@ export default function App() {
                     isGenerating={isLoading}
                     onGenerate={handleGenerate}
                     isEmailSelected={!!customerEmail.trim()}
+                    trackingNumber={trackingNumber}
+                    setTrackingNumber={setTrackingNumber}
+                    selectedAction={selectedAction}
+                    setSelectedAction={setSelectedAction}
+                    selectedTone={selectedTone}
+                    setSelectedTone={setSelectedTone}
+                    currentSentiment={activeEmail?.sentiment}
                     t={t}
                   />
 
-                  {/* Preview Panel - Only show if generated or generating */}
+                  {/* PreviewPanel - Only show if generated or generating */}
                   {(generatedEmail || isLoading || error) && (
-                    <div className="xl:col-span-1">
-                      <PreviewPanel
-                        generatedEmail={generatedEmail}
-                        setGeneratedEmail={setGeneratedEmail}
-                        isLoading={isLoading}
-                        error={error}
-                        copied={copied}
-                        onCopyToClipboard={handleCopyToClipboard}
-                        onRefine={handleRefine}
-                        onApprove={handleApprove}
-                        t={t}
-                      />
-                    </div>
+                    <PreviewPanel
+                      generatedEmail={generatedEmail}
+                      setGeneratedEmail={setGeneratedEmail}
+                      isLoading={isLoading}
+                      error={error}
+                      copied={copied}
+                      onCopyToClipboard={handleCopyToClipboard}
+                      onRefine={handleRefine}
+                      onApprove={handleApprove}
+                      t={t}
+                    />
                   )}
                 </div>
               </div>
-            ) : (
-              /* Empty State (Desktop) */
-              <div className="hidden lg:flex h-full items-center justify-center text-center p-10 opacity-50">
-                <div className="max-w-md">
-                  <div className="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <InboxIcon className="w-10 h-10 text-slate-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">{t.previewPlaceholder}</h3>
-                  <p className="text-slate-500 dark:text-slate-400">{t.previewPlaceholderDesc}</p>
+            </div>
+          ) : (
+            /* Empty State (Desktop) */
+            <div className="hidden lg:flex h-full items-center justify-center text-center p-10 opacity-50">
+              <div className="max-w-md">
+                <div className="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <InboxIcon className="w-10 h-10 text-slate-400" />
                 </div>
+                <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">{t.previewPlaceholder}</h3>
+                <p className="text-slate-500 dark:text-slate-400">{t.previewPlaceholderDesc}</p>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </main>
+
+      {/* 3. Footer Fijo (Siempre visible al final) */}
+      <div className="flex-none z-10">
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { GenerationMode } from '../types';
-import { SparkIcon, GoogleIcon, NetworkIntelligenceIcon, ChevronDownIcon, ChevronUpIcon, MagicWandIcon } from './Icons';
+import React, { useEffect } from 'react';
+import { GenerationMode, Sentiment } from '../types';
+import { SparkIcon, MagicWandIcon, ChevronDownIcon, ChevronUpIcon } from './Icons';
 
 interface ControlPanelProps {
     generationMode: GenerationMode;
@@ -10,6 +10,14 @@ interface ControlPanelProps {
     isGenerating: boolean;
     onGenerate: () => void;
     isEmailSelected: boolean;
+    // New Props for Enhanced UI
+    trackingNumber: string;
+    setTrackingNumber: (val: string) => void;
+    selectedAction: string | null;
+    setSelectedAction: (val: string | null) => void;
+    selectedTone: string | null;
+    setSelectedTone: (val: string | null) => void;
+    currentSentiment?: Sentiment;
     t: any;
 }
 
@@ -21,38 +29,54 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     isGenerating,
     onGenerate,
     isEmailSelected,
+    trackingNumber,
+    setTrackingNumber,
+    selectedAction,
+    setSelectedAction,
+    selectedTone,
+    setSelectedTone,
+    currentSentiment,
     t,
 }) => {
-    const [isInstructionsOpen, setIsInstructionsOpen] = useState(true);
+    const [isInstructionsOpen, setIsInstructionsOpen] = React.useState(true);
 
-    const generationOptions = [
-        {
-            id: GenerationMode.Standard,
-            label: t.modeStandard,
-            description: t.modeStandardDesc,
-            icon: <SparkIcon className="w-3.5 h-3.5 text-purple-600" />
-        },
-        {
-            id: GenerationMode.Search,
-            label: t.modeSearch,
-            description: t.modeSearchDesc,
-            icon: <GoogleIcon className="w-3.5 h-3.5" />
-        },
-        {
-            id: GenerationMode.Thinking,
-            label: t.modeThinking,
-            description: t.modeThinkingDesc,
-            icon: <NetworkIntelligenceIcon className="w-3.5 h-3.5 text-emerald-600" />
-        },
+    // ACTION CHIPS DATA
+    const actions = [
+        { label: '📍 Rastrear', value: 'Rastrear' },
+        { label: '💸 Reembolso', value: 'Reembolso' },
+        { label: '📦 Reenviar', value: 'Reenviar' },
+        { label: '❌ Cancelar', value: 'Cancelar' },
     ];
 
-    const quickActions = [
-        { label: t.qaEmpathetic, value: "Use a very empathetic and apologetic tone." },
-        { label: t.qaFirm, value: "Be polite but firm on company policies." },
-        { label: t.qaRefund, value: "Process a full refund immediately." },
-        { label: t.qaDiscount, value: "Offer a 15% discount code for next time." },
-        { label: t.qaShipping, value: t.qaShippingValue },
+    // TONE CHIPS DATA
+    const tones = [
+        { label: '🥰 Empático', value: 'Empático' },
+        { label: '🧐 Formal', value: 'Formal' },
+        { label: '⚡ Breve', value: 'Breve' },
     ];
+
+    // SMART LOGIC: Auto-select 'Empático' if sentiment is 'Angry'
+    useEffect(() => {
+        if (currentSentiment === 'Angry') {
+            setSelectedTone('Empático');
+        }
+    }, [currentSentiment, setSelectedTone]);
+
+    // Update custom instructions based on selection
+    useEffect(() => {
+        let instructions = '';
+        if (selectedAction) instructions += `Action: ${selectedAction}. `;
+        if (selectedTone) instructions += `Tone: ${selectedTone}. `;
+        if (trackingNumber) instructions += `Tracking Number: ${trackingNumber}. `;
+
+        // Only update if we have structured data, otherwise leave manual edits?
+        // For this task, we will just prepend/append or let the user see the chips state.
+        // But commonly, these chips might feed into the prompt instructions variable.
+        // Let's keep it simple: we pass these values to the parent, 
+        // AND we can also sync them to customInstructions for visibility if desired.
+        // The user asked for UI primarily. Let's JUST set the state for now.
+    }, [selectedAction, selectedTone, trackingNumber]);
+
 
     const GenerateButtonContent = () => (
         <>
@@ -74,34 +98,13 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     );
 
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 p-5 space-y-5">
-            {/* Mode Selector - Horizontal & Compact */}
-            <div>
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                    {t.modeTitle}
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                    {generationOptions.map((option) => (
-                        <button
-                            key={option.id}
-                            onClick={() => setGenerationMode(option.id)}
-                            className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all duration-200 ${generationMode === option.id
-                                ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-500/50 text-indigo-700 dark:text-indigo-300'
-                                : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-500 hover:border-indigo-200'
-                                }`}
-                        >
-                            <div className="mb-1">{option.icon}</div>
-                            <span className="text-[10px] font-bold">{option.label}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 space-y-5">
 
-            {/* Custom Instructions with Quick Actions */}
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-700">
+            {/* INSTRUCTIONS & CHIPS AREA */}
+            <div className="pt-2">
                 <button
                     onClick={() => setIsInstructionsOpen(!isInstructionsOpen)}
-                    className="w-full flex items-center justify-between mb-3 group"
+                    className="w-full flex items-center justify-between mb-4 group"
                 >
                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 group-hover:text-indigo-600 transition-colors flex items-center gap-2">
                         <MagicWandIcon className="w-3 h-3" />
@@ -111,26 +114,63 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 </button>
 
                 {isInstructionsOpen && (
-                    <div className="animate-in slide-in-from-top-2 duration-200 space-y-3">
-                        {/* Quick Actions Chips */}
+                    <div className="animate-in slide-in-from-top-2 duration-200 space-y-4">
+
+                        {/* CHIPS ROW 1: ACTIONS */}
+                        {/* CHIPS ROW 1: ACTIONS */}
                         <div className="flex flex-wrap gap-2">
-                            {quickActions.map((action, idx) => (
+                            {actions.map((action) => (
                                 <button
-                                    key={idx}
-                                    onClick={() => setCustomInstructions(action.value)}
-                                    className="px-2.5 py-1.5 bg-slate-100 dark:bg-slate-700 rounded-lg text-[10px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-indigo-100 hover:text-indigo-700 dark:hover:bg-indigo-900 dark:hover:text-indigo-300 transition-colors"
+                                    key={action.value}
+                                    onClick={() => setSelectedAction(selectedAction === action.value ? null : action.value)}
+                                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${selectedAction === action.value
+                                        ? 'bg-black text-white border-black shadow-sm'
+                                        : 'bg-white text-gray-900 border-gray-200 hover:bg-gray-50'
+                                        }`}
                                 >
                                     {action.label}
                                 </button>
                             ))}
                         </div>
 
+                        {/* CHIPS ROW 2: TONES */}
+                        <div className="flex flex-wrap gap-2">
+                            {tones.map((tone) => (
+                                <button
+                                    key={tone.value}
+                                    onClick={() => setSelectedTone(selectedTone === tone.value ? null : tone.value)}
+                                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${selectedTone === tone.value
+                                        ? 'bg-black text-white border-black shadow-sm'
+                                        : 'bg-white text-gray-900 border-gray-200 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    {tone.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* TEXTAREA */}
                         <textarea
                             value={customInstructions}
                             onChange={(e) => setCustomInstructions(e.target.value)}
                             placeholder={t.instructionsPlaceholder}
-                            className="w-full h-20 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none custom-scrollbar"
+                            className="w-full h-24 bg-white border border-gray-200 rounded-xl p-3 text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-black focus:border-black outline-none resize-none custom-scrollbar transition-all"
                         />
+
+                        {/* TRACKING INPUT */}
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span className="text-gray-400">🔗</span>
+                            </div>
+                            <input
+                                type="text"
+                                value={trackingNumber}
+                                onChange={(e) => setTrackingNumber(e.target.value)}
+                                placeholder="Pegar enlace de seguimiento aquí"
+                                className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-black focus:border-black outline-none transition-all shadow-sm"
+                            />
+                        </div>
+
                     </div>
                 )}
             </div>
@@ -140,18 +180,18 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 <button
                     onClick={onGenerate}
                     disabled={isGenerating || !isEmailSelected}
-                    className="w-full py-3.5 bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-slate-900/20 dark:shadow-indigo-500/20 transform transition-all active:scale-[0.98] disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                    className="w-full py-3.5 bg-black hover:bg-gray-800 text-white rounded-xl font-bold text-sm shadow-md transform transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
                 >
                     <GenerateButtonContent />
                 </button>
             </div>
 
-            {/* Mobile Sticky Action Bar - Now part of ControlPanel but will be rendered in Main Panel on mobile */}
-            <div className="fixed bottom-0 left-0 w-full p-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 lg:hidden z-50">
+            {/* Mobile Sticky Action Bar */}
+            <div className="fixed bottom-0 left-0 w-full p-4 bg-white/90 backdrop-blur-md border-t border-gray-200 lg:hidden z-50">
                 <button
                     onClick={onGenerate}
                     disabled={isGenerating || !isEmailSelected}
-                    className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm shadow-lg shadow-indigo-500/30 transform transition-all active:scale-[0.98] disabled:opacity-50 disabled:shadow-none flex justify-center items-center gap-2"
+                    className="w-full py-4 bg-black text-white rounded-2xl font-bold text-sm shadow-lg transform transition-all active:scale-[0.98] disabled:opacity-50 flex justify-center items-center gap-2"
                 >
                     <GenerateButtonContent />
                 </button>

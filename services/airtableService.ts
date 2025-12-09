@@ -1,4 +1,4 @@
-import { EmailRecord } from '../types';
+import { EmailRecord, Urgency, Sentiment } from '../types';
 
 const API_KEY = import.meta.env.VITE_AIRTABLE_API_KEY;
 const BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID;
@@ -20,6 +20,9 @@ export interface MappedEmail {
     threadId: string;
     status: string;
     draftReplyBody?: string;
+    urgency?: Urgency;
+    sentiment?: Sentiment;
+    language?: string;
 }
 
 export const fetchPendingEmails = async (): Promise<MappedEmail[]> => {
@@ -50,6 +53,9 @@ export const fetchPendingEmails = async (): Promise<MappedEmail[]> => {
             threadId: record.fields['Thread ID'],
             status: record.fields['Status'],
             draftReplyBody: record.fields['Draft Reply Body'],
+            urgency: record.fields['Urgency'],
+            sentiment: record.fields['Sentiment'],
+            language: record.fields['Language'],
         }));
     } catch (error) {
         console.error("Failed to fetch emails from Airtable:", error);

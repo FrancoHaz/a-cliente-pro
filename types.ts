@@ -17,6 +17,9 @@ export interface QuickAction {
   icon: string;
 }
 
+export type Urgency = 'High' | 'Medium' | 'Low';
+export type Sentiment = 'Angry' | 'Neutral' | 'Happy';
+
 export interface EmailRecord {
   id: string;
   fields: {
@@ -28,6 +31,9 @@ export interface EmailRecord {
     "Received At": string;
     "Thread ID": string;
     "Draft Reply Body"?: string;
+    "Urgency"?: Urgency;
+    "Sentiment"?: Sentiment;
+    "Language"?: string;
   };
   createdTime: string;
 }
